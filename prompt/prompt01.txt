@@ -1,0 +1,3010 @@
+# FULL MASTER PROMPT
+
+## NEWBERG TEA CENTRE — PRODUCTION-READY FULL-STACK WEB APPLICATION
+
+You are a senior software architect, senior Next.js engineer, React engineer, PostgreSQL/Neon database engineer, UI/UX designer, security engineer, DevOps engineer and QA engineer.
+
+Your task is to build the complete **Newberg Tea Centre** full-stack web application.
+
+This is not a tutorial project.
+
+This must be structured as a real production-oriented application that can be deployed to Vercel and use Neon PostgreSQL as its persistent database.
+
+The user will provide the Neon PostgreSQL connection string through an environment variable.
+
+The supplied Newberg Tea Centre HTML demo is the PRIMARY visual and interaction reference.
+
+DO NOT replace the design with a generic SaaS dashboard.
+
+DO NOT redesign the public website unnecessarily.
+
+DO NOT remove existing useful functionality.
+
+The reference demo must be carefully studied before implementation.
+
+============================================================
+
+1. PRODUCT PURPOSE
+   ============================================================
+
+Newberg Tea Centre is a tea information and transparent pricing platform.
+
+The public website allows visitors to:
+
+* discover tea categories
+* browse tea grades
+* understand grade descriptions
+* see current tea prices
+* see price changes
+* see availability
+* explore the tea production journey
+* understand tea benefits
+* calculate price by gram quantity
+* compare tea grades
+* discover Ceylon tea
+
+The administration system allows authorized staff to:
+
+* manage tea categories
+* create/edit/delete tea grades
+* update prices
+* preserve complete price history
+* update availability
+* mark teas as available
+* mark teas as low stock
+* mark teas as out of stock
+* publish/unpublish teas
+* manage category information
+* perform bulk price updates
+* inspect price history
+* inspect admin activity
+* manage public-facing information
+* manage application settings
+
+The central business feature is:
+
+ADMIN CHANGES TEA PRICE
+↓
+DATABASE
+↓
+PRICE HISTORY CREATED
+↓
+PUBLIC WEBSITE REFRESHED
+↓
+CUSTOMER SEES CURRENT PRICE + CHANGE
+
+The application must make this workflow reliable.
+
+============================================================
+2. REQUIRED TECHNOLOGY STACK
+============================
+
+Use:
+
+* Next.js
+* React
+* TypeScript
+* App Router
+* Tailwind CSS
+* shadcn/ui where appropriate
+* PostgreSQL
+* Neon PostgreSQL
+* Drizzle ORM
+* Zod
+* secure server-side authentication
+* Vercel-compatible deployment
+
+Prefer a single Next.js application instead of a separate Express backend.
+
+Do NOT create an unnecessary long-running server.
+
+Use Next.js server-side route handlers/server functions for backend operations.
+
+Architecture:
+
+Browser
+↓
+Next.js
+↓
+Server / API
+↓
+Service Layer
+↓
+Drizzle ORM
+↓
+Neon PostgreSQL
+
+The browser MUST NOT connect directly to Neon.
+
+============================================================
+3. ENVIRONMENT VARIABLES
+========================
+
+Use environment variables.
+
+Required:
+
+DATABASE_URL=
+
+Authentication secrets must also use environment variables.
+
+Example:
+
+AUTH_SECRET=
+NEXTAUTH_SECRET=
+
+Use whichever authentication implementation is selected, but secrets must never be hardcoded.
+
+Create:
+
+.env.example
+
+Never commit:
+
+.env
+.env.local
+
+to Git.
+
+DATABASE_URL must never be exposed through:
+
+NEXT_PUBLIC_*
+
+Do not place the Neon connection string into React client code.
+
+============================================================
+4. COMPLETE PROJECT STRUCTURE
+=============================
+
+Generate the following structure.
+
+newberg-tea-centre/
+│
+├── app/
+│   │
+│   ├── (public)/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   │
+│   │   ├── tea/
+│   │   │   ├── page.tsx
+│   │   │   └── [slug]/
+│   │   │       └── page.tsx
+│   │   │
+│   │   ├── grades/
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── about/
+│   │   │   └── page.tsx
+│   │   │
+│   │   └── not-found.tsx
+│   │
+│   ├── (auth)/
+│   │   └── admin/
+│   │       └── login/
+│   │           └── page.tsx
+│   │
+│   ├── admin/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   │
+│   │   ├── tea/
+│   │   │   ├── page.tsx
+│   │   │   ├── new/
+│   │   │   │   └── page.tsx
+│   │   │   └── [id]/
+│   │   │       ├── page.tsx
+│   │   │       └── edit/
+│   │   │           └── page.tsx
+│   │   │
+│   │   ├── categories/
+│   │   │   ├── page.tsx
+│   │   │   ├── new/
+│   │   │   │   └── page.tsx
+│   │   │   └── [id]/
+│   │   │       └── edit/
+│   │   │           └── page.tsx
+│   │   │
+│   │   ├── prices/
+│   │   │   ├── page.tsx
+│   │   │   ├── update/
+│   │   │   │   └── page.tsx
+│   │   │   ├── bulk/
+│   │   │   │   └── page.tsx
+│   │   │   └── history/
+│   │   │       └── page.tsx
+│   │   │
+│   │   ├── availability/
+│   │   │   └── page.tsx
+│   │   │
+│   │   ├── activity/
+│   │   │   └── page.tsx
+│   │   │
+│   │   └── settings/
+│   │       └── page.tsx
+│   │
+│   ├── api/
+│   │   │
+│   │   ├── public/
+│   │   │   ├── categories/
+│   │   │   │   └── route.ts
+│   │   │   ├── teas/
+│   │   │   │   ├── route.ts
+│   │   │   │   └── [slug]/
+│   │   │   │       └── route.ts
+│   │   │   ├── grades/
+│   │   │   │   └── route.ts
+│   │   │   └── prices/
+│   │   │       └── route.ts
+│   │   │
+│   │   └── admin/
+│   │       ├── categories/
+│   │       │   ├── route.ts
+│   │       │   └── [id]/
+│   │       │       └── route.ts
+│   │       │
+│   │       ├── teas/
+│   │       │   ├── route.ts
+│   │       │   └── [id]/
+│   │       │       └── route.ts
+│   │       │
+│   │       ├── prices/
+│   │       │   ├── route.ts
+│   │       │   ├── [teaId]/
+│   │       │   │   └── route.ts
+│   │       │   ├── bulk/
+│   │       │   │   └── route.ts
+│   │       │   └── history/
+│   │       │       └── route.ts
+│   │       │
+│   │       ├── availability/
+│   │       │   └── route.ts
+│   │       │
+│   │       ├── activity/
+│   │       │   └── route.ts
+│   │       │
+│   │       └── settings/
+│   │           └── route.ts
+│   │
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── robots.ts
+│   ├── sitemap.ts
+│   └── not-found.tsx
+│
+├── components/
+│   │
+│   ├── public/
+│   │   ├── Navbar.tsx
+│   │   ├── MobileMenu.tsx
+│   │   ├── Hero.tsx
+│   │   ├── TeaPriceFinder.tsx
+│   │   ├── TeaCategoryTabs.tsx
+│   │   ├── TeaFilterBar.tsx
+│   │   ├── TeaGradeCard.tsx
+│   │   ├── TeaGradeDetails.tsx
+│   │   ├── PriceChangeBadge.tsx
+│   │   ├── AvailabilityBadge.tsx
+│   │   ├── PriceCalculator.tsx
+│   │   ├── TeaJourney.tsx
+│   │   ├── TeaJourneyStep.tsx
+│   │   ├── TeaBenefits.tsx
+│   │   ├── BenefitCard.tsx
+│   │   ├── ConceptSection.tsx
+│   │   └── Footer.tsx
+│   │
+│   ├── admin/
+│   │   ├── AdminShell.tsx
+│   │   ├── AdminSidebar.tsx
+│   │   ├── AdminHeader.tsx
+│   │   ├── MobileAdminMenu.tsx
+│   │   ├── DashboardStats.tsx
+│   │   ├── DashboardRecentChanges.tsx
+│   │   ├── DashboardActivity.tsx
+│   │   ├── TeaTable.tsx
+│   │   ├── TeaTableFilters.tsx
+│   │   ├── TeaEditor.tsx
+│   │   ├── TeaForm.tsx
+│   │   ├── PriceEditor.tsx
+│   │   ├── QuickPriceEditor.tsx
+│   │   ├── BulkPriceEditor.tsx
+│   │   ├── BulkPricePreview.tsx
+│   │   ├── AvailabilityToggle.tsx
+│   │   ├── PublicationToggle.tsx
+│   │   ├── CategoryTable.tsx
+│   │   ├── CategoryEditor.tsx
+│   │   ├── PriceHistoryTable.tsx
+│   │   ├── PriceHistoryTimeline.tsx
+│   │   ├── ActivityTable.tsx
+│   │   ├── SettingsForm.tsx
+│   │   └── ConfirmActionDialog.tsx
+│   │
+│   └── ui/
+│       ├── button.tsx
+│       ├── input.tsx
+│       ├── textarea.tsx
+│       ├── select.tsx
+│       ├── dialog.tsx
+│       ├── dropdown-menu.tsx
+│       ├── badge.tsx
+│       ├── card.tsx
+│       ├── table.tsx
+│       ├── tabs.tsx
+│       ├── toast.tsx
+│       ├── tooltip.tsx
+│       ├── switch.tsx
+│       ├── checkbox.tsx
+│       ├── separator.tsx
+│       └── skeleton.tsx
+│
+├── db/
+│   ├── index.ts
+│   ├── client.ts
+│   ├── schema/
+│   │   ├── users.ts
+│   │   ├── categories.ts
+│   │   ├── tea-grades.ts
+│   │   ├── prices.ts
+│   │   ├── price-history.ts
+│   │   ├── activity-logs.ts
+│   │   └── settings.ts
+│   └── seed.ts
+│
+├── lib/
+│   │
+│   ├── auth/
+│   │   ├── config.ts
+│   │   ├── session.ts
+│   │   ├── password.ts
+│   │   ├── permissions.ts
+│   │   └── guards.ts
+│   │
+│   ├── services/
+│   │   ├── tea-service.ts
+│   │   ├── category-service.ts
+│   │   ├── price-service.ts
+│   │   ├── availability-service.ts
+│   │   ├── activity-service.ts
+│   │   ├── dashboard-service.ts
+│   │   └── settings-service.ts
+│   │
+│   ├── validations/
+│   │   ├── auth.ts
+│   │   ├── category.ts
+│   │   ├── tea.ts
+│   │   ├── price.ts
+│   │   ├── availability.ts
+│   │   ├── bulk-price.ts
+│   │   └── settings.ts
+│   │
+│   ├── utils/
+│   │   ├── currency.ts
+│   │   ├── dates.ts
+│   │   ├── percentages.ts
+│   │   ├── slug.ts
+│   │   ├── formatters.ts
+│   │   └── constants.ts
+│   │
+│   ├── types/
+│   │   ├── tea.ts
+│   │   ├── category.ts
+│   │   ├── price.ts
+│   │   ├── user.ts
+│   │   ├── admin.ts
+│   │   └── api.ts
+│   │
+│   └── db/
+│       └── transactions.ts
+│
+├── drizzle/
+│   └── migrations/
+│
+├── public/
+│   ├── images/
+│   │   ├── branding/
+│   │   ├── tea/
+│   │   ├── grades/
+│   │   ├── journey/
+│   │   └── benefits/
+│   └── icons/
+│
+├── scripts/
+│   ├── seed-admin.ts
+│   ├── seed-data.ts
+│   ├── verify-db.ts
+│   └── check-production.ts
+│
+├── tests/
+│   ├── unit/
+│   │   ├── price-calculation.test.ts
+│   │   ├── percentage-change.test.ts
+│   │   └── validation.test.ts
+│   │
+│   ├── integration/
+│   │   ├── price-update.test.ts
+│   │   ├── availability.test.ts
+│   │   └── authentication.test.ts
+│   │
+│   └── e2e/
+│       ├── public-site.spec.ts
+│       ├── admin-login.spec.ts
+│       ├── tea-management.spec.ts
+│       └── price-management.spec.ts
+│
+├── middleware.ts
+├── drizzle.config.ts
+├── next.config.ts
+├── postcss.config.mjs
+├── tailwind.config.ts
+├── tsconfig.json
+├── package.json
+├── .env.example
+├── .gitignore
+└── README.md
+
+============================================================
+5. PUBLIC WEBSITE
+=================
+
+Rebuild the public website based on the supplied Newberg Tea Centre HTML demo.
+
+Preserve:
+
+* Newberg Tea Centre branding
+* Ceylon Tea identity
+* cream background
+* deep tea-green palette
+* gold accents
+* paper cards
+* rounded corners
+* subtle shadows
+* Georgia/serif display headings
+* clean sans-serif text
+* responsive navigation
+* mobile menu
+* tea price finder
+* expandable tea cards
+* tea journey
+* price calculator
+* tea benefits
+* footer
+* search and sorting
+
+The reference demo already contains these major concepts and they must remain represented in the React implementation.
+
+Do not transform the public website into a generic ecommerce store.
+
+This is primarily:
+
+TEA DISCOVERY
++
+TEA INFORMATION
++
+PRICE TRANSPARENCY
+
+============================================================
+6. PUBLIC NAVIGATION
+====================
+
+Navigation should include approximately:
+
+Tea Prices
+Tea Grades
+About
+Why Tea
+Contact
+
+Use the existing Newberg navigation style as reference.
+
+Desktop:
+
+logo
+navigation
+primary CTA
+
+Mobile:
+
+logo
+menu button
+mobile navigation
+
+Use sticky navigation where appropriate.
+
+============================================================
+7. HERO
+=======
+
+Preserve the concept:
+
+Know your tea.
+Know the price.
+
+The hero should contain:
+
+* Ceylon Tea label
+* primary heading
+* supporting description
+* Explore tea prices CTA
+* Explore grades CTA
+* small informational highlights
+* tea visual area
+
+The hero should display a database-driven starting price when available.
+
+Example:
+
+from Rs. 1,090 /kg
+
+The actual value must come from the current public price records.
+
+============================================================
+8. TEA CATEGORIES
+=================
+
+Initial seed categories:
+
+Black Tea
+Green Tea
+Specialty Tea
+
+Do not hardcode the final category list permanently into React.
+
+The database is the source of truth.
+
+Each category must support:
+
+id
+name
+slug
+subtitle
+description
+display_order
+is_active
+
+The public website should only show active categories.
+
+============================================================
+9. TEA GRADES
+=============
+
+Each tea grade must contain:
+
+id
+category_id
+grade_code
+name
+slug
+processing_method
+group_name
+description
+taste_profile
+cup_colour
+best_for
+availability
+is_published
+display_order
+created_at
+updated_at
+
+Example initial grades should be derived from the supplied demo.
+
+The demo currently includes grades such as:
+
+BOP
+BOPF
+FBOP
+OP
+BP1
+
+and additional demo tea grades.
+
+Use the complete reference demo data when seeding.
+
+Do not invent production claims.
+
+============================================================
+10. TEA CARD
+============
+
+Every public tea grade card must show:
+
+Grade
+Category
+Processing method
+Current price
+Price change
+Availability
+
+Expandable details should include:
+
+Taste
+Description
+Cup colour
+Best for
+Processing method
+
+Maintain the existing expandable-card interaction concept from the demo.
+
+============================================================
+11. AVAILABILITY
+================
+
+Availability is a REQUIRED business feature.
+
+Use these exact values:
+
+AVAILABLE
+LOW_STOCK
+OUT_OF_STOCK
+
+Display them clearly.
+
+Examples:
+
+Available
+Low stock
+Out of stock
+
+Do not rely only on colour.
+
+Each status must have text.
+
+OUT_OF_STOCK does NOT mean hidden.
+
+A tea can remain visible while unavailable for purchase or enquiry.
+
+Example:
+
+FBOP
+Rs. 1,460/kg
+OUT OF STOCK
+
+The card remains visible.
+
+============================================================
+12. PUBLICATION STATUS
+======================
+
+Use a separate field:
+
+is_published
+
+Possible states:
+
+Published
+Draft
+Hidden
+
+Publication status is independent of availability.
+
+Examples:
+
+Published + Available
+Published + Low Stock
+Published + Out of Stock
+Draft + Available
+Hidden + Available
+
+Public website:
+
+SHOW only published grades.
+
+Admin:
+
+SHOW everything permitted by authorization.
+
+============================================================
+13. PRICING
+===========
+
+The main business feature is price management.
+
+Current price must be stored in PostgreSQL.
+
+Currency:
+
+LKR
+
+Price basis:
+
+EX_FACTORY_PER_KG
+
+Example:
+
+BOP
+Rs. 1,280/kg
+
+The public website must retrieve current prices from the database.
+
+Never hardcode live prices in the client.
+
+============================================================
+14. PRICE HISTORY
+=================
+
+Every price change must create a history record.
+
+Do NOT overwrite history.
+
+Example:
+
+BOP
+
+01 Sep 2026
+Rs. 1,280
+
+08 Sep 2026
+Rs. 1,310
+
+15 Sep 2026
+Rs. 1,295
+
+Database:
+
+price_history
+
+Fields:
+
+id
+tea_grade_id
+old_price
+new_price
+percentage_change
+currency
+effective_from
+changed_by
+reason
+created_at
+
+============================================================
+15. PRICE CHANGE CALCULATION
+============================
+
+Formula:
+
+percentageChange =
+((newPrice - oldPrice) / oldPrice) × 100
+
+Example:
+
+Old:
+1280
+
+New:
+1310
+
+Change:
++2.34%
+
+Handle:
+
+old price = null
+old price = 0
+new price = 0
+negative prices
+invalid numeric input
+
+safely.
+
+Display:
+
+↑ 2.34%
+
+or:
+
+↓ 2.34%
+
+or:
+
+No change
+
+Use appropriate semantic states.
+
+============================================================
+16. PRICE EFFECTIVE DATE
+========================
+
+Each price must support:
+
+effective_from
+effective_to
+is_current
+
+Only one current price per tea grade.
+
+When a new price is created:
+
+previous current price becomes historical
+new price becomes current
+
+Perform this consistently.
+
+============================================================
+17. PRICE UPDATE TRANSACTION
+============================
+
+When an administrator changes a price:
+
+1. authenticate user
+2. authorize permission
+3. validate input
+4. read current price
+5. calculate difference
+6. create price history record
+7. close previous price record
+8. create new current price
+9. create activity log
+10. revalidate public data
+11. return success
+
+Use a PostgreSQL transaction.
+
+If any step fails, rollback the entire operation.
+
+Do not leave partial updates.
+
+============================================================
+18. QUICK PRICE UPDATE
+======================
+
+Admin tea table should provide a quick price-update action.
+
+Example:
+
+BOP
+Rs. 1,280/kg
+
+[Edit Price]
+
+Click:
+
+Current price:
+Rs. 1,280
+
+New price:
+[ 1295 ]
+
+Effective date:
+[ date ]
+
+Reason:
+[ optional / required ]
+
+Preview:
+
+Rs. 1,280 → Rs. 1,295
++1.17%
+
+[Cancel]
+[Save Price]
+
+============================================================
+19. BULK PRICE UPDATE
+=====================
+
+Create:
+
+/admin/prices/bulk
+
+Allow selection of multiple tea grades.
+
+Actions:
+
+Increase by %
+Decrease by %
+Increase by fixed LKR
+Decrease by fixed LKR
+
+Example:
+
+Select:
+
+BOP
+BOPF
+FBOP
+OP
+
+Increase:
+
+3%
+
+Preview:
+
+BOP
+1280 → 1318.40
+
+BOPF
+1210 → 1246.30
+
+FBOP
+1460 → 1503.80
+
+OP
+1390 → 1431.70
+
+Require explicit confirmation.
+
+Create individual price history records.
+
+Create activity log.
+
+============================================================
+20. PRICE HISTORY UI
+====================
+
+Create:
+
+/admin/prices/history
+
+Provide:
+
+search
+tea filter
+category filter
+date range
+admin user filter
+increase/decrease filter
+
+Table:
+
+Tea
+Old Price
+New Price
+Change
+Effective Date
+Changed By
+Reason
+
+Also provide a tea-specific timeline.
+
+============================================================
+21. PRICE CALCULATOR
+====================
+
+Preserve the reference demo calculator.
+
+Inputs:
+
+Category
+Tea grade
+Price per kg
+Amount in grams
+
+Calculation:
+
+price = pricePerKg * grams / 1000
+
+Examples:
+
+100 g
+250 g
+500 g
+1000 g
+
+Display:
+
+Rs. 128.00
+100g
+
+Use LKR formatting.
+
+When category changes:
+
+tea-grade dropdown must update.
+
+When tea grade changes:
+
+current database price should populate.
+
+Admin must be able to manage prices without modifying the calculator.
+
+============================================================
+22. TEA JOURNEY
+===============
+
+Preserve the current production journey interaction.
+
+Steps:
+
+01 Plucking
+02 Withering
+03 Rolling
+04 Oxidation
+05 Drying
+06 Grading
+07 Tasting & dispatch
+
+Keep the visual storytelling style.
+
+Use interactive step navigation.
+
+Do not turn this section into an admin-only component.
+
+Content should remain controlled and maintainable.
+
+============================================================
+23. TEA BENEFITS
+================
+
+The public site must contain a tea-benefits section.
+
+Use practical and cautious wording.
+
+Recommended benefit concepts:
+
+Gentle energy
+Rich in natural plant compounds
+Light and refreshing
+Suitable throughout the day
+
+Avoid medical promises.
+
+Do not claim tea cures disease.
+
+Do not claim tea prevents disease unless independently verified and appropriately presented.
+
+Keep it consumer-friendly.
+
+============================================================
+24. FOOTER
+==========
+
+Create a professional Newberg footer.
+
+Suggested groups:
+
+Newberg Tea Centre
+
+Explore:
+Tea Prices
+Tea Grades
+Tea Journey
+Why Tea
+
+Learn about Ceylon Tea:
+Growing Regions
+Tea Information
+Official Tea Board Resources
+
+Contact:
+Newberg Tea Centre
+Contact information placeholder where appropriate
+
+Do not include fake "production-ready data" fields.
+
+Do not invent official affiliations.
+
+============================================================
+25. ADMIN PANEL
+===============
+
+The admin panel is protected.
+
+Route:
+
+/admin
+
+Main sidebar:
+
+Dashboard
+Tea Catalogue
+Categories
+Prices
+Availability
+Price History
+Activity
+Settings
+
+Footer/sidebar:
+
+User
+Role
+Sign out
+
+============================================================
+26. ADMIN DESIGN
+================
+
+Admin should visually belong to Newberg.
+
+Do not use:
+
+generic blue SaaS dashboard
+random gradients
+neon colours
+unrelated corporate templates
+
+Use:
+
+tea green
+cream
+paper backgrounds
+gold accents
+subtle borders
+rounded cards
+serif section headings where appropriate
+clean tables
+clear badges
+
+Admin can be denser and more data-oriented than the public site.
+
+============================================================
+27. ADMIN DASHBOARD
+===================
+
+Dashboard:
+
+/admin
+
+Statistics:
+
+Total Tea Grades
+Published
+Available
+Low Stock
+Out of Stock
+Total Categories
+Average Price
+Price Changes This Week
+
+Show:
+
+Recent Price Changes
+Recently Updated Tea
+Recent Admin Activity
+
+All values must come from database queries.
+
+No hardcoded dashboard statistics.
+
+============================================================
+28. ADMIN TEA CATALOGUE
+=======================
+
+Route:
+
+/admin/tea
+
+Table:
+
+Grade
+Category
+Method
+Current Price
+Price Change
+Availability
+Publication
+Updated
+Actions
+
+Actions:
+
+Edit
+Price
+Availability
+Publish
+History
+
+Filters:
+
+Search
+Category
+Availability
+Publication
+Processing method
+
+Sorting:
+
+Grade A-Z
+Price low-high
+Price high-low
+Last updated
+Largest price change
+
+============================================================
+29. ADMIN CREATE TEA
+====================
+
+Route:
+
+/admin/tea/new
+
+Fields:
+
+Category
+Grade Code
+Name
+Processing Method
+Group
+Description
+Taste Profile
+Cup Colour
+Best For
+Display Order
+Availability
+Publication
+
+Validate with Zod.
+
+Prevent duplicate grade codes.
+
+============================================================
+30. ADMIN EDIT TEA
+==================
+
+Route:
+
+/admin/tea/[id]/edit
+
+Display current values.
+
+Allow update.
+
+Show Save button.
+
+Show validation.
+
+Show loading state.
+
+Show success state.
+
+Show error state.
+
+Do not lose unsaved changes silently.
+
+============================================================
+31. ADMIN AVAILABILITY
+======================
+
+Availability must have a dedicated control.
+
+Use:
+
+AVAILABLE
+LOW_STOCK
+OUT_OF_STOCK
+
+Provide direct table control.
+
+Example:
+
+[ Available ▼ ]
+
+Changing to:
+
+Out of stock
+
+must:
+
+1. validate
+2. update database
+3. create activity log
+4. refresh admin UI
+5. refresh public data
+
+Do not modify price automatically.
+
+Do not modify publication automatically.
+
+============================================================
+32. ADMIN PUBLICATION
+=====================
+
+Use:
+
+Published
+Draft
+Hidden
+
+Provide:
+
+Publish
+Unpublish
+Hide
+
+Publication changes create activity logs.
+
+Public site must exclude unpublished records.
+
+============================================================
+33. CATEGORY MANAGEMENT
+=======================
+
+Route:
+
+/admin/categories
+
+Features:
+
+list categories
+create category
+edit category
+activate/deactivate category
+change display order
+
+Fields:
+
+name
+slug
+subtitle
+description
+display_order
+is_active
+
+Do not allow deletion if doing so would violate foreign-key/business rules.
+
+Prefer deactivation for categories already containing tea grades.
+
+============================================================
+34. ADMIN ACTIVITY LOG
+======================
+
+Route:
+
+/admin/activity
+
+Track:
+
+LOGIN
+LOGOUT
+CREATE_TEA
+UPDATE_TEA
+UPDATE_PRICE
+BULK_PRICE_UPDATE
+UPDATE_AVAILABILITY
+PUBLISH_TEA
+UNPUBLISH_TEA
+CREATE_CATEGORY
+UPDATE_CATEGORY
+UPDATE_SETTINGS
+
+Display:
+
+Timestamp
+User
+Action
+Entity
+Description
+
+Use readable language.
+
+Example:
+
+Admin updated BOP price from Rs. 1,280 to Rs. 1,295.
+
+============================================================
+35. ADMIN SETTINGS
+==================
+
+Route:
+
+/admin/settings
+
+Settings:
+
+Currency
+Price basis
+Default effective date
+Price update frequency
+Public disclaimer
+Default pagination
+Public site configuration
+
+Never expose:
+
+DATABASE_URL
+AUTH_SECRET
+password hashes
+
+============================================================
+36. ADMIN LOGIN
+===============
+
+Route:
+
+/admin/login
+
+Login page should visually match Newberg.
+
+Fields:
+
+Email
+Password
+
+Features:
+
+show/hide password
+validation
+loading
+authentication error
+logout
+session handling
+
+Do not display hardcoded demo credentials.
+
+Do not implement frontend-only fake authentication.
+
+============================================================
+37. AUTHORIZATION
+=================
+
+Protected:
+
+/admin
+/admin/*
+/api/admin/*
+
+Unauthenticated request:
+
+redirect /admin/login
+
+Forbidden request:
+
+return 403.
+
+Server-side authorization is mandatory.
+
+Never trust role information supplied by browser.
+
+============================================================
+38. USER ROLES
+==============
+
+Support:
+
+ADMIN
+EDITOR
+
+ADMIN:
+
+full access
+
+EDITOR:
+
+tea
+price
+availability
+catalogue
+
+Optionally restrict:
+
+settings
+user management
+sensitive configuration
+
+Authorization should be centralized.
+
+============================================================
+39. DATABASE SCHEMA
+===================
+
+Create:
+
+users
+categories
+tea_grades
+prices
+price_history
+activity_logs
+settings
+
+Use foreign keys.
+
+Use indexes for:
+
+category_id
+tea_grade_id
+is_published
+availability
+effective_from
+created_at
+slug
+
+Use unique constraints where appropriate.
+
+============================================================
+40. DATABASE USERS
+==================
+
+Fields:
+
+id
+name
+email
+password_hash
+role
+is_active
+created_at
+updated_at
+
+Email must be unique.
+
+Password must never be stored plaintext.
+
+============================================================
+41. DATABASE CATEGORIES
+=======================
+
+Fields:
+
+id
+name
+slug
+subtitle
+description
+display_order
+is_active
+created_at
+updated_at
+
+============================================================
+42. DATABASE TEA GRADES
+=======================
+
+Fields:
+
+id
+category_id
+grade_code
+name
+slug
+processing_method
+group_name
+description
+taste_profile
+cup_colour
+best_for
+availability
+is_published
+display_order
+created_at
+updated_at
+
+Indexes:
+
+category_id
+availability
+is_published
+slug
+
+============================================================
+43. DATABASE PRICES
+===================
+
+Fields:
+
+id
+tea_grade_id
+price_per_kg
+currency
+price_basis
+effective_from
+effective_to
+is_current
+created_at
+created_by
+
+Rules:
+
+current price unique per tea grade.
+
+============================================================
+44. DATABASE PRICE HISTORY
+==========================
+
+Fields:
+
+id
+tea_grade_id
+old_price
+new_price
+percentage_change
+currency
+price_basis
+effective_from
+changed_by
+reason
+created_at
+
+============================================================
+45. DATABASE ACTIVITY LOGS
+==========================
+
+Fields:
+
+id
+user_id
+action
+entity_type
+entity_id
+description
+metadata
+created_at
+
+metadata should be JSON/JSONB.
+
+============================================================
+46. DATABASE SETTINGS
+=====================
+
+Fields:
+
+id
+key
+value
+updated_by
+updated_at
+
+Use safe and validated values.
+
+============================================================
+47. API DESIGN
+==============
+
+PUBLIC:
+
+GET /api/public/categories
+
+GET /api/public/teas
+
+GET /api/public/teas/[slug]
+
+GET /api/public/grades
+
+GET /api/public/prices
+
+ADMIN:
+
+GET /api/admin/tea
+
+POST /api/admin/tea
+
+GET /api/admin/tea/[id]
+
+PUT /api/admin/tea/[id]
+
+DELETE /api/admin/tea/[id]
+
+GET /api/admin/categories
+
+POST /api/admin/categories
+
+PUT /api/admin/categories/[id]
+
+GET /api/admin/prices
+
+POST /api/admin/prices
+
+PUT /api/admin/prices/[teaId]
+
+POST /api/admin/prices/bulk
+
+GET /api/admin/prices/history
+
+PATCH /api/admin/availability
+
+GET /api/admin/activity
+
+GET /api/admin/settings
+
+PUT /api/admin/settings
+
+============================================================
+48. API RESPONSE FORMAT
+=======================
+
+Use consistent responses.
+
+Success:
+
+{
+"success": true,
+"data": ...
+}
+
+Error:
+
+{
+"success": false,
+"error": {
+"code": "...",
+"message": "..."
+}
+}
+
+Never expose stack traces to users.
+
+============================================================
+49. VALIDATION
+==============
+
+Use Zod for:
+
+login
+tea
+category
+price
+bulk price
+availability
+settings
+
+Price:
+
+must be numeric
+must be >= 0
+reasonable precision
+
+Availability:
+
+must be enum
+
+Publication:
+
+must be enum
+
+Category:
+
+must exist
+
+Tea grade:
+
+grade code unique
+
+============================================================
+50. ERROR HANDLING
+==================
+
+Handle:
+
+401 Unauthorized
+403 Forbidden
+404 Not Found
+409 Conflict
+422 Validation Error
+429 Too Many Requests
+500 Server Error
+
+Display friendly messages.
+
+Server logs may contain detailed technical errors.
+
+Browser responses must not expose sensitive internals.
+
+============================================================
+51. SECURITY
+============
+
+Implement:
+
+secure session cookies
+httpOnly cookies
+secure cookies in production
+sameSite protection
+password hashing
+authorization
+input validation
+rate limiting strategy
+safe database queries
+ORM parameterization
+server-side role checks
+CSRF protection where required
+audit logs
+
+Never trust client-supplied:
+
+user id
+role
+price history
+permissions
+created_by
+changed_by
+
+Derive those server-side from authenticated session.
+
+============================================================
+52. PASSWORD SECURITY
+=====================
+
+Use a modern password hashing solution.
+
+Never:
+
+store plaintext passwords
+return password hashes
+log passwords
+send passwords in URLs
+
+============================================================
+53. LOGIN RATE LIMITING
+=======================
+
+Protect admin login against brute force.
+
+Use a reasonable strategy compatible with Vercel/serverless.
+
+At minimum:
+
+IP/session-aware limiting
+failed-attempt handling
+generic authentication failure messages
+
+============================================================
+54. CACHING
+===========
+
+Public content should be cached appropriately.
+
+Admin mutations must revalidate affected public content.
+
+When price changes:
+
+public price finder must be refreshed.
+
+When availability changes:
+
+public tea cards must be refreshed.
+
+When publication changes:
+
+public catalogue must be refreshed.
+
+============================================================
+55. SEO
+=======
+
+Generate:
+
+metadata
+OpenGraph
+description
+canonical URLs
+
+Grade pages should have dynamic metadata.
+
+Example:
+
+Newberg Tea Centre | BOP Ceylon Tea
+
+Admin routes:
+
+noindex
+
+============================================================
+56. RESPONSIVENESS
+==================
+
+Public:
+
+desktop
+tablet
+mobile
+
+Admin:
+
+desktop
+tablet
+mobile
+
+On mobile:
+
+collapse sidebar
+use mobile menu
+make tables usable
+make dialogs fit screen
+avoid horizontal overflow where possible
+
+============================================================
+57. ACCESSIBILITY
+=================
+
+Use:
+
+semantic HTML
+labels
+keyboard support
+focus states
+ARIA where needed
+screen-reader-friendly status
+non-colour-only availability indicators
+
+Example:
+
+Available
+Low stock
+Out of stock
+
+must be readable as text.
+
+============================================================
+58. IMAGE HANDLING
+==================
+
+Use next/image where appropriate.
+
+Do not hotlink random external images in production.
+
+Use:
+
+public/images/
+
+for final assets.
+
+Where a reference image is externally hosted and cannot safely be distributed, use a local placeholder with the same dimensions/composition.
+
+============================================================
+59. SEED DATA
+=============
+
+Seed:
+
+Black Tea
+Green Tea
+Specialty Tea
+
+Seed the tea grades from the supplied Newberg reference demo.
+
+Use the reference demo's existing grade names and demo prices.
+
+Demo values must be clearly treated as demonstration data.
+
+Do not label sample values as official live market data.
+
+============================================================
+60. SEED ADMIN USER
+===================
+
+Provide:
+
+scripts/seed-admin.ts
+
+Allow environment variables:
+
+ADMIN_EMAIL=
+ADMIN_PASSWORD=
+ADMIN_NAME=
+
+Hash the password before insertion.
+
+Do not hardcode production credentials.
+
+============================================================
+61. PUBLIC VS PRIVATE DATA
+==========================
+
+PUBLIC DATA:
+
+category
+grade
+description
+taste
+processing method
+availability
+current public price
+price change
+effective date
+public images
+
+PRIVATE DATA:
+
+users
+password hashes
+activity logs
+admin metadata
+internal configuration
+
+Never expose private data through public endpoints.
+
+============================================================
+62. PRICE DISPLAY
+=================
+
+Public:
+
+Rs. 1,295 /kg
+
+Price change:
+
+↑ 1.17%
+
+or:
+
+↓ 1.17%
+
+Availability:
+
+AVAILABLE
+
+LOW STOCK
+
+OUT OF STOCK
+
+Also:
+
+Effective:
+08 Sep 2026
+
+Use consistent date formatting.
+
+============================================================
+63. ADMIN DASHBOARD PRICE SNAPSHOT
+==================================
+
+Show:
+
+Top price increases
+Top price decreases
+Recently changed
+Current average
+Highest price
+Lowest price
+
+Do not fabricate values.
+
+All derived dynamically.
+
+============================================================
+64. FILTERS
+===========
+
+PUBLIC FILTERS:
+
+category
+search
+grade
+processing method
+price sorting
+A-Z
+availability
+
+ADMIN FILTERS:
+
+category
+availability
+publication
+processing method
+price range
+date modified
+
+============================================================
+65. PAGINATION
+==============
+
+Implement pagination for admin data if needed.
+
+Do not load thousands of rows unnecessarily.
+
+Use server-side pagination.
+
+============================================================
+66. SEARCH
+==========
+
+Public search should search:
+
+grade code
+grade name
+taste
+description
+processing method
+
+Admin search should search:
+
+same plus status fields.
+
+Use database queries.
+
+Do not filter an enormous dataset entirely in the browser.
+
+============================================================
+67. EMPTY STATES
+================
+
+Implement:
+
+No teas
+No categories
+No price history
+No activity
+No search results
+
+Provide useful messages and actions.
+
+============================================================
+68. LOADING STATES
+==================
+
+Use skeletons/spinners where appropriate.
+
+Do not freeze the page.
+
+============================================================
+69. CONFIRMATION DIALOGS
+========================
+
+Confirm:
+
+delete
+publish
+unpublish
+bulk price updates
+major changes where appropriate
+
+Example:
+
+"Update 8 tea prices?"
+
+Show preview before irreversible actions.
+
+============================================================
+70. PRICE BULK UPDATE SAFETY
+============================
+
+Never immediately execute bulk updates without preview.
+
+Workflow:
+
+Select teas
+↓
+Choose operation
+↓
+Generate preview
+↓
+Review old/new values
+↓
+Confirm
+↓
+Transaction
+↓
+History created
+↓
+Activity logged
+↓
+Public cache revalidated
+
+============================================================
+71. CATEGORY SAFETY
+===================
+
+Do not allow accidental category removal if teas depend on it.
+
+Preferred:
+
+Deactivate category.
+
+Prompt administrator if destructive deletion is attempted.
+
+============================================================
+72. ACTIVITY LOGGING
+====================
+
+Every important business mutation must create an activity record.
+
+Price update example:
+
+Admin User
+UPDATE_PRICE
+BOP
+Rs. 1,280 → Rs. 1,295
+
+Availability:
+
+Admin User
+UPDATE_AVAILABILITY
+FBOP
+Available → Out of stock
+
+Publication:
+
+Admin User
+PUBLISH_TEA
+OP
+Draft → Published
+
+============================================================
+73. DATA CONSISTENCY
+====================
+
+Business rules must be enforced at database/service level.
+
+Do not depend solely on UI restrictions.
+
+Example:
+
+Even if the UI disables an action, the API must still validate it.
+
+============================================================
+74. SERVICE LAYER
+=================
+
+Implement:
+
+getPublishedTea()
+getTeaBySlug()
+createTea()
+updateTea()
+deleteTea()
+publishTea()
+unpublishTea()
+changeAvailability()
+getCurrentPrice()
+updatePrice()
+bulkUpdatePrices()
+getPriceHistory()
+createCategory()
+updateCategory()
+logActivity()
+getDashboardStats()
+
+Business logic should not live inside UI components.
+
+============================================================
+75. DRIZZLE
+===========
+
+Generate:
+
+schema
+relations
+migrations
+seed
+
+Use Drizzle relations correctly.
+
+Use transactions for:
+
+price changes
+bulk price changes
+other multi-step mutations
+
+============================================================
+76. NEXT.JS SERVER / CLIENT BOUNDARY
+====================================
+
+Prefer server components.
+
+Use client components for:
+
+filters
+interactive cards
+dialogs
+forms
+toggles
+calculators
+mobile menus
+
+Do not unnecessarily mark entire pages as:
+
+"use client"
+
+============================================================
+77. STATE MANAGEMENT
+====================
+
+Avoid unnecessary global state libraries.
+
+Use:
+
+server data
+React state
+URL search parameters
+server actions/API where appropriate
+
+Use URL state for useful filters when appropriate.
+
+============================================================
+78. PUBLIC PRICE REFRESH
+========================
+
+The admin does NOT need to redeploy the Vercel project after changing a price.
+
+Example:
+
+Admin:
+
+BOP
+1280 → 1295
+
+Save
+
+Database updated.
+
+Public site:
+
+BOP
+Rs. 1,295/kg
+↑ 1.17%
+
+This must work without rebuilding the application.
+
+============================================================
+79. ADMIN USER EXPERIENCE
+=========================
+
+Admin should be optimized around the most common operation:
+
+UPDATE TEA PRICE
+
+The admin must be able to:
+
+open catalogue
+find tea
+change price
+set effective date
+provide reason
+preview change
+save
+see success
+see history
+
+with minimal clicks.
+
+============================================================
+80. ADMIN TABLE QUICK ACTIONS
+=============================
+
+Tea table should make these actions easy:
+
+Edit
+Price
+Availability
+Publish
+History
+
+Do not force administrators through multiple unnecessary pages.
+
+============================================================
+81. DASHBOARD RECENT CHANGES
+============================
+
+Show examples dynamically:
+
+BOP
+Rs. 1,280 → Rs. 1,295
++1.17%
+
+BOPF
+Rs. 1,210 → Rs. 1,185
+-2.07%
+
+Include:
+
+timestamp
+admin
+effective date
+
+============================================================
+82. DESIGN SYSTEM
+=================
+
+Create reusable design tokens.
+
+Reference palette:
+
+deep tea green
+dark green
+cream
+paper
+gold
+muted green
+soft green
+muted text
+border
+
+Use CSS variables where appropriate.
+
+Do not hardcode dozens of different colours.
+
+============================================================
+83. TYPOGRAPHY
+==============
+
+Use:
+
+serif display headings
+
+clean sans-serif interface text
+
+Headings should maintain the elegant tea-brand character of the reference demo.
+
+============================================================
+84. MOTION
+==========
+
+Keep animation restrained.
+
+Use:
+
+fade
+slide
+hover
+expand/collapse
+
+Respect:
+
+prefers-reduced-motion
+
+Do not create excessive animation.
+
+============================================================
+85. PUBLIC TEA DETAILS
+======================
+
+Create:
+
+/tea/[slug]
+
+Page should contain:
+
+grade
+name
+category
+price
+price change
+availability
+processing method
+description
+taste
+cup colour
+best for
+
+CTA:
+
+Explore more teas
+
+============================================================
+86. GRADE GUIDE
+===============
+
+Create:
+
+/grades
+
+Explain tea grades simply.
+
+Use data-driven grades.
+
+Allow opening a grade in the price finder.
+
+============================================================
+87. ABOUT
+=========
+
+Create:
+
+/about
+
+Use tea journey/content concepts from the reference.
+
+Do not invent unsupported company claims.
+
+============================================================
+88. PUBLIC FOOTER LINKS
+=======================
+
+Use valid internal routes.
+
+External official tea resources may be included where appropriate.
+
+Do not fabricate links.
+
+============================================================
+89. DATA SEEDING
+================
+
+Seed reference-demo data only.
+
+Mark demo pricing clearly.
+
+Run:
+
+npm run db:seed
+
+Also support:
+
+npm run db:seed-admin
+
+============================================================
+90. NPM SCRIPTS
+===============
+
+package.json should provide:
+
+npm run dev
+npm run build
+npm run start
+npm run lint
+npm run test
+npm run test:e2e
+
+Database:
+
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+npm run db:seed-admin
+npm run db:studio
+
+============================================================
+91. README
+==========
+
+README must contain:
+
+Project overview
+Features
+Architecture
+File structure
+Requirements
+Installation
+Environment variables
+Neon setup
+Drizzle setup
+Migration
+Seed
+Admin creation
+Local development
+Testing
+Build
+Vercel deployment
+Production deployment
+Troubleshooting
+
+============================================================
+92. NEON SETUP
+==============
+
+The user will provide:
+
+DATABASE_URL
+
+Explain how to place it in:
+
+.env.local
+
+Do not print the actual connection string.
+
+Never commit it.
+
+============================================================
+93. VERCEL DEPLOYMENT
+=====================
+
+Document:
+
+GitHub repository
+Vercel project
+environment variables
+DATABASE_URL
+authentication secret
+production deployment
+database migrations
+
+Application must run in serverless Vercel environment.
+
+============================================================
+94. DATABASE MIGRATION STRATEGY
+===============================
+
+Use Drizzle migrations.
+
+Commands:
+
+generate
+migrate
+
+Do not automatically destroy the production database.
+
+============================================================
+95. ERROR RECOVERY
+==================
+
+For database failure:
+
+friendly error
+
+For authentication failure:
+
+generic authentication error
+
+For validation:
+
+specific field errors
+
+For network failure:
+
+retry where appropriate
+
+============================================================
+96. TESTING
+===========
+
+Create tests for:
+
+price calculation
+percentage calculation
+price update
+price history
+availability
+publication
+authentication
+authorization
+bulk update
+category management
+
+E2E tests:
+
+admin login
+catalogue
+edit tea
+update price
+change availability
+publish tea
+public website update
+
+============================================================
+97. CRITICAL SECURITY TESTS
+===========================
+
+Verify:
+
+anonymous user cannot access /admin
+anonymous user cannot call /api/admin/*
+editor cannot modify restricted settings
+client cannot impersonate another user
+client cannot set changed_by
+client cannot inject price history
+database secrets are not exposed
+passwords are not exposed
+
+============================================================
+98. BUILD VERIFICATION
+======================
+
+Before final output:
+
+npm install
+npm run lint
+npm run build
+npm run test
+
+Fix all TypeScript errors.
+
+Fix all lint errors.
+
+Fix all build errors.
+
+Do not say the project is complete while build errors remain.
+
+============================================================
+99. FINAL UI VERIFICATION
+=========================
+
+Verify:
+
+public desktop
+public mobile
+admin desktop
+admin mobile
+login
+logout
+tea catalogue
+price editor
+availability toggle
+publication toggle
+bulk update
+price history
+dashboard
+footer
+calculator
+search
+filters
+
+============================================================
+100. DATA FLOW VERIFICATION
+===========================
+
+Test:
+
+Database:
+BOP = 1280
+
+Public:
+BOP = 1280
+
+Admin:
+change BOP to 1295
+
+Save
+
+Database:
+current = 1295
+
+History:
+1280 → 1295
+
+Activity:
+price updated
+
+Public:
+1295
+
+Price change:
++1.17%
+
+Verify end-to-end.
+
+============================================================
+101. IMPORTANT PUBLIC DATA RULE
+===============================
+
+Do not use static JavaScript arrays for live tea prices.
+
+The current demo contains static data for demonstration.
+
+The production implementation must move this data into Neon.
+
+Reference-demo content should become seed data, not permanent frontend constants.
+
+============================================================
+102. IMPORTANT DEMO RULE
+========================
+
+The supplied HTML reference is an existing working prototype.
+
+Before writing the application:
+
+* inspect all sections
+* inspect all CSS
+* inspect all JavaScript
+* identify interactions
+* identify data model
+* identify responsive behavior
+* identify visual tokens
+* identify existing tea categories
+* identify tea grades
+* identify price behaviour
+* identify expandable cards
+* identify calculator
+* identify journey slider
+* identify menu
+* identify footer
+* identify availability concepts
+
+Reimplement these concepts in React/Next.js.
+
+Do not merely wrap the HTML inside React.
+
+============================================================
+103. DO NOT BREAK EXISTING DESIGN INTENT
+========================================
+
+Avoid:
+
+generic dashboard redesign
+generic ecommerce redesign
+unnecessary colour changes
+unnecessary font changes
+removing interactive elements
+removing mobile responsiveness
+removing price calculator
+removing tea benefits
+removing tea journey
+
+============================================================
+104. ADMIN / PUBLIC RELATIONSHIP
+================================
+
+Think of the application as:
+
+```
+         NEWBERG DATABASE
+                │
+      ┌─────────┴─────────┐
+      │                   │
+ PUBLIC SITE          ADMIN PANEL
+      │                   │
+  READ DATA          READ + WRITE
+      │                   │
+      └─────────┬─────────┘
+                │
+            Neon DB
+```
+
+Public:
+
+READ ONLY
+
+Admin:
+
+READ + WRITE
+
+============================================================
+105. CORE ADMIN WORKFLOW
+========================
+
+Most important workflow:
+
+ADMIN LOGIN
+
+↓
+
+DASHBOARD
+
+↓
+
+TEA CATALOGUE
+
+↓
+
+FIND TEA
+
+↓
+
+EDIT PRICE
+
+↓
+
+PREVIEW CHANGE
+
+↓
+
+SAVE
+
+↓
+
+PRICE HISTORY
+
+↓
+
+ACTIVITY LOG
+
+↓
+
+PUBLIC WEBSITE UPDATED
+
+This workflow must feel extremely fast and intuitive.
+
+============================================================
+106. CORE PUBLIC WORKFLOW
+=========================
+
+Customer:
+
+LAND ON SITE
+
+↓
+
+SEE TEA
+
+↓
+
+CHOOSE CATEGORY
+
+↓
+
+SEARCH / FILTER
+
+↓
+
+OPEN GRADE
+
+↓
+
+SEE TASTE / DESCRIPTION
+
+↓
+
+SEE CURRENT PRICE
+
+↓
+
+SEE AVAILABILITY
+
+↓
+
+CALCULATE QUANTITY
+
+↓
+
+CHOOSE TEA
+
+============================================================
+107. FINAL QUALITY STANDARD
+===========================
+
+The final application must feel like:
+
+a real tea-industry information and pricing platform.
+
+It must NOT feel like:
+
+a coding tutorial
+a mock SaaS dashboard
+a static HTML demo
+a fake ecommerce site
+
+============================================================
+108. REQUIRED FINAL OUTPUT
+==========================
+
+Generate the complete project.
+
+Do not provide pseudo-code where real code is required.
+
+Do not skip files by writing:
+
+"same as above"
+
+Do not use fake placeholder API calls when real implementation is possible.
+
+Provide:
+
+complete source code
+database schema
+migrations
+seed scripts
+authentication
+services
+API
+React components
+public pages
+admin pages
+tests
+README
+environment template
+
+At the end, print:
+
+1. Complete file tree
+2. Installation steps
+3. Database setup
+4. Seed instructions
+5. Admin account setup
+6. Local run instructions
+7. Test instructions
+8. Vercel deployment instructions
+9. Neon configuration instructions
+
+============================================================
+109. FINAL INSTRUCTION
+======================
+
+Treat the supplied Newberg Tea Centre HTML demo as the visual and interaction source of truth.
+
+Treat Neon PostgreSQL as the production data source.
+
+Treat the admin panel as the authoritative data-management interface.
+
+Treat price history as permanent business history.
+
+Treat availability and publication status as independent.
+
+Treat security as mandatory.
+
+Treat the database as the source of truth.
+
+Treat the public site as a read-oriented presentation layer.
+
+Build the application completely and coherently.
+
+Do not simplify the requested architecture merely to reduce implementation work.
+
+Do not omit the admin functionality.
+
+Do not omit price history.
+
+Do not omit availability.
+
+Do not omit out-of-stock functionality.
+
+Do not omit authentication.
+
+Do not omit responsive design.
+
+Do not omit database migrations.
+
+Do not omit tests.
+
+Do not omit the README.
+
+The final application must be runnable, maintainable and deployable to Vercel with Neon PostgreSQL.

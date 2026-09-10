@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Newberg Tea Centre — Admin Login</title>
+<style>
+:root{--ink:#173226;--ink2:#2e4d3d;--cream:#f4f0e7;--paper:#fffdf8;--gold:#c69a52;--gold2:#e2c78e;--muted:#68736c;--line:#e3ddcf;--soft:#edf2e8;--danger:#9a604c;--shadow:0 25px 70px rgba(23,50,38,.13)}
+*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{background:radial-gradient(circle at 12% 10%,rgba(226,199,142,.28),transparent 30%),radial-gradient(circle at 90% 88%,rgba(111,138,96,.2),transparent 32%),var(--cream);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;display:grid;place-items:center;padding:24px}.shell{width:min(980px,100%);display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:30px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}.visual{position:relative;min-height:620px;padding:42px;color:#fff;background:linear-gradient(150deg,#193c2a,#4f704b 58%,#b99759);overflow:hidden}.visual:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 18%,rgba(226,199,142,.5),transparent 20%),linear-gradient(180deg,rgba(10,28,18,.02),rgba(10,28,18,.58))}.leaf{position:absolute;width:180px;height:270px;border-radius:90% 8% 90% 8%;background:linear-gradient(135deg,#a9c091,#376543);opacity:.42;filter:drop-shadow(0 20px 24px rgba(0,0,0,.2));transform:rotate(35deg)}.leaf.a{left:-65px;top:30px}.leaf.b{right:-55px;top:170px;transform:rotate(-24deg) scale(.82)}.leaf.c{left:30%;bottom:-95px;transform:rotate(55deg) scale(.65)}.ridge{position:absolute;left:-8%;right:-8%;bottom:-2%;height:48%;background:linear-gradient(180deg,#61775a,#203d2c);clip-path:polygon(0 43%,16% 31%,30% 48%,43% 24%,56% 42%,71% 17%,87% 35%,100% 22%,100% 100%,0 100%)}.visual-content{position:relative;z-index:2;max-width:380px;height:100%;display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:11px}.mark{width:42px;height:42px;border-radius:13px;background:#0e281d;position:relative;box-shadow:0 8px 20px rgba(0,0,0,.18)}.mark:before,.mark:after{content:"";position:absolute;width:11px;height:19px;left:12px;top:7px;background:var(--gold);border-radius:90% 8% 90% 8%;transform:rotate(-34deg)}.mark:after{left:21px;top:13px;transform:rotate(34deg)}.brand strong{font-family:Georgia,serif;font-size:21px;display:block}.brand span{font-size:8px;letter-spacing:.16em;font-weight:900;color:#d4dfd5}.visual-copy{margin-top:auto;margin-bottom:40px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:10px;font-weight:900;color:var(--gold2)}.visual h1{font-family:Georgia,serif;font-weight:600;font-size:clamp(39px,5vw,62px);line-height:.98;letter-spacing:-.04em;margin:12px 0 16px}.visual p{max-width:360px;color:#e1e9e1;font-size:13px;line-height:1.7}.pill{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:8px 11px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);border-radius:999px;font-size:10px;font-weight:900}.pill i{width:6px;height:6px;border-radius:50%;background:#8fc098;box-shadow:0 0 0 4px rgba(143,192,152,.1)}.form-side{padding:44px;display:flex;align-items:center}.form-wrap{width:100%;max-width:390px;margin:auto}.form-wrap h2{font-family:Georgia,serif;font-size:36px;line-height:1.05;margin:8px 0}.lead{font-size:12px;color:var(--muted);margin:0 0 26px}.field-group{margin-top:15px}.field-group label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.1em;font-weight:900;color:var(--muted);margin-bottom:6px}.field{width:100%;border:1px solid var(--line);background:#fff;padding:13px 13px;border-radius:12px;outline:none;color:var(--ink);font-size:13px}.field:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(198,154,82,.11)}.password-wrap{position:relative}.password-wrap .field{padding-right:44px}.show-pass{position:absolute;right:7px;top:7px;width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:var(--muted);cursor:pointer}.show-pass:hover{background:#f5f0e6}.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:13px}.check{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:10.5px}.check input{accent-color:var(--ink)}.forgot{border:0;background:transparent;color:#8a6a35;font-size:10.5px;font-weight:850;cursor:pointer;padding:0}.submit{width:100%;margin-top:20px;border:0;border-radius:13px;padding:13px 15px;background:var(--ink);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 10px 22px rgba(23,50,38,.15)}.submit:hover{background:#10261b;transform:translateY(-1px)}.demo-note{margin-top:16px;padding:11px 13px;border-radius:12px;background:#fff8eb;border:1px solid #eadcbd;color:#766545;font-size:10px;line-height:1.5}.error{display:none;margin-top:14px;padding:10px 12px;border-radius:11px;background:#fbefed;border:1px solid #e7cbc4;color:var(--danger);font-size:10.5px;font-weight:700}.error.show{display:block}.footer-note{text-align:center;margin-top:26px;font-size:9.5px;color:#8b938d}
+@media(max-width:780px){.shell{grid-template-columns:1fr}.visual{min-height:350px;padding:28px}.visual-copy{margin-top:70px;margin-bottom:8px}.visual h1{font-size:44px}.form-side{padding:30px 24px}.form-wrap h2{font-size:31px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="visual">
+    <div class="leaf a"></div><div class="leaf b"></div><div class="leaf c"></div><div class="ridge"></div>
+    <div class="visual-content">
+      <div class="brand"><span class="mark"></span><div><strong>Newberg</strong><span>TEA CENTRE</span></div></div>
+      <div class="visual-copy">
+        <div class="eyebrow">Admin workspace</div>
+        <h1>Manage the tea. Keep the story clear.</h1>
+        <p>Control tea categories, grades, prices and availability from one secure catalogue workspace.</p>
+        <div class="pill"><i></i> Catalogue management portal</div>
+      </div>
+    </div>
+  </section>
+  <section class="form-side">
+    <div class="form-wrap">
+      <div class="eyebrow">Welcome back</div>
+      <h2>Sign in to Newberg Admin</h2>
+      <p class="lead">Use your administrator account to access the tea catalogue control centre.</p>
+      <form id="loginForm">
+        <div class="field-group"><label for="username">Email or username</label><input class="field" id="username" autocomplete="username" placeholder="admin@newbergtea.lk" required></div>
+        <div class="field-group"><label for="password">Password</label><div class="password-wrap"><input class="field" id="password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button class="show-pass" type="button" id="showPass" aria-label="Show password">◉</button></div></div>
+        <div class="row"><label class="check"><input id="remember" type="checkbox"> Keep me signed in</label><button type="button" class="forgot" id="forgot">Forgot password?</button></div>
+        <button class="submit" type="submit">Sign in to dashboard →</button>
+        <div class="error" id="error">Invalid demo credentials. Please check your username and password.</div>
+        <div class="demo-note"><strong>Demo access:</strong> username <strong>admin</strong> · password <strong>newberg2026</strong></div>
+      </form>
+      <div class="footer-note">Newberg Tea Centre · Administration interface · Demo</div>
+    </div>
+  </section>
+</div>
+<script>
+const form=document.getElementById('loginForm'),user=document.getElementById('username'),pass=document.getElementById('password'),error=document.getElementById('error');
+document.getElementById('showPass').addEventListener('click',()=>{const shown=pass.type==='text';pass.type=shown?'password':'text';document.getElementById('showPass').textContent=shown?'◉':'◌';document.getElementById('showPass').setAttribute('aria-label',shown?'Show password':'Hide password')});
+document.getElementById('forgot').addEventListener('click',()=>{alert('Demo mode: connect this action to your real password-reset workflow when the backend is added.')});
+form.addEventListener('submit',(e)=>{e.preventDefault();const ok=(user.value.trim().toLowerCase()==='admin'||user.value.trim().toLowerCase()==='admin@newbergtea.lk')&&pass.value==='newberg2026';if(!ok){error.classList.add('show');return}error.classList.remove('show');try{sessionStorage.setItem('newberg_admin_auth','1');sessionStorage.setItem('newberg_admin_user',user.value.trim())}catch(e){}window.location.href='newberg_admin_panel.html'});
+</script>
+</body>
+</html>

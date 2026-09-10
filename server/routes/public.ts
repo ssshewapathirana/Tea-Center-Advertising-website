@@ -1,0 +1,171 @@
+import { Router, Request, Response } from "express";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+import { eq, and, asc, sql, ilike, or } from "drizzle-orm";
+import { categories } from "../../db/schema/categories";
+import { teaGrades } from "../../db/schema/tea-grades";
+import { prices } from "../../db/schema/prices";
+
+const router = Router();
+
+function getDb() {
+  return drizzle(neon(process.env.DATABASE_URL!));
+}
+
+// GET /api/public/categories
+router.get("/categories", async (_req: Request, res: Response) => {
+  try {
+    const db = getDb();
+    const result = await db.select().from(categories).where(eq(categories.isActive, true)).orderBy(asc(categories.displayOrder));
+    res.json({ success: true, data: result });
+  } catch (err) {
+    console.error("Error fetching categories:", err);
+    res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: "Failed to fetch categories" } });
+  }
+});
+
+// GET /api/public/grades - all published grades with current prices and categories
+router.get("/grades", async (req: Request, res: Response) => {
+  try {
+    const db = getDb();
+    const { category, search, sort } = req.query;
+
+    let query = db
+      .select({
+        id: teaGrades.id,
+        gradeCode: teaGrades.gradeCode,
+        name: teaGrades.name,
+        slug: teaGrades.slug,
+        processingMethod: teaGrades.processingMethod,
+        groupName: teaGrades.groupName,
+        description: teaGrades.description,
+        tasteProfile: teaGrades.tasteProfile,
+        cupColour: teaGrades.cupColour,
+        bestFor: teaGrades.bestFor,
+        availability: teaGrades.availability,
+        displayOrder: teaGrades.displayOrder,
+        categoryId: categories.id,
+        categoryName: categories.name,
+        categorySlug: categories.slug,
+        priceId: prices.id,
+        pricePerKg: prices.pricePerKg,
+        currency: prices.currency,
+      })
+      .from(teaGrades)
+      .innerJoin(categories, eq(teaGrades.categoryId, categories.id))
+      .innerJoin(prices, and(eq(prices.teaGradeId, teaGrades.id), eq(prices.isCurrent, true)))
+      .where(eq(teaGrades.isPublished, true))
+      .orderBy(asc(teaGrades.displayOrder));
+
+    // Apply category filter
+    const conditions = [eq(teaGrades.isPublished, true)];
+    if (category && typeof category === "string") {
+      conditions.push(eq(categories.slug, category));
+    }
+    if (search && typeof search === "string") {
+      const q = `%${search}%`;
+      conditions.push(
+        or(
+          ilike(teaGrades.gradeCode, q),
+          ilike(teaGrades.name, q),
+          ilike(teaGrades.description, q),
+          ilike(teaGrades.tasteProfile, q),
+          ilike(teaGrades.processingMethod, q)
+        )!
+      );
+    }
+
+    const result = await db
+      .select({
+        id: teaGrades.id,
+        gradeCode: teaGrades.gradeCode,
+        name: teaGrades.name,
+        slug: teaGrades.slug,
+        processingMethod: teaGrades.processingMethod,
+        groupName: teaGrades.groupName,
+        description: teaGrades.description,
+        tasteProfile: teaGrades.tasteProfile,
+        cupColour: teaGrades.cupColour,
+        bestFor: teaGrades.bestFor,
+        availability: teaGrades.availability,
+        displayOrder: teaGrades.displayOrder,
+        categoryId: categories.id,
+        categoryName: categories.name,
+        categorySlug: categories.slug,
+        pricePerKg: prices.pricePerKg,
+        currency: prices.currency,
+      })
+      .from(teaGrades)
+      .innerJoin(categories, eq(teaGrades.categoryId, categories.id))
+      .innerJoin(prices, and(eq(prices.teaGradeId, teaGrades.id), eq(prices.isCurrent, true)))
+      .where(and(...conditions));
+
+    res.json({ success: true, data: result });
+  } catch (err) {
+    console.error("Error fetching grades:", err);
+    res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: "Failed to fetch grades" } });
+  }
+});
+
+// GET /api/public/grades/:slug
+router.get("/grades/:slug", async (req: Request, res: Response) => {
+  try {
+    const db = getDb();
+    const result = await db
+      .select({
+        id: teaGrades.id,
+        gradeCode: teaGrades.gradeCode,
+        name: teaGrades.name,
+        slug: teaGrades.slug,
+        processingMethod: teaGrades.processingMethod,
+        groupName: teaGrades.groupName,
+        description: teaGrades.description,
+        tasteProfile: teaGrades.tasteProfile,
+        cupColour: teaGrades.cupColour,
+        bestFor: teaGrades.bestFor,
+        availability: teaGrades.availability,
+        categoryName: categories.name,
+        categorySlug: categories.slug,
+        pricePerKg: prices.pricePerKg,
+        currency: prices.currency,
+      })
+      .from(teaGrades)
+      .innerJoin(categories, eq(teaGrades.categoryId, categories.id))
+      .innerJoin(prices, and(eq(prices.teaGradeId, teaGrades.id), eq(prices.isCurrent, true)))
+      .where(and(eq(teaGrades.slug, req.params.slug), eq(teaGrades.isPublished, true)));
+
+    if (!result.length) {
+      res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "Tea grade not found" } });
+      return;
+    }
+
+    res.json({ success: true, data: result[0] });
+  } catch (err) {
+    console.error("Error fetching grade:", err);
+    res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: "Failed to fetch grade" } });
+  }
+});
+
+// GET /api/public/stats - hero stats
+router.get("/stats", async (_req: Request, res: Response) => {
+  try {
+    const db = getDb();
+    const gradesResult = await db.execute(sql`SELECT COUNT(*) as count FROM tea_grades WHERE is_published = true`);
+    const minPrice = await db.execute(sql`SELECT MIN(p.price_per_kg) as min_price FROM prices p JOIN tea_grades t ON t.id = p.tea_grade_id WHERE t.is_published = true AND p.is_current = true`);
+    const avgPrice = await db.execute(sql`SELECT AVG(p.price_per_kg) as avg_price FROM prices p JOIN tea_grades t ON t.id = p.tea_grade_id WHERE t.is_published = true AND p.is_current = true`);
+
+    res.json({
+      success: true,
+      data: {
+        totalGrades: Number(gradesResult.rows[0]?.count) || 0,
+        minPrice: Number(minPrice.rows[0]?.min_price) || 0,
+        avgPrice: Number(avgPrice.rows[0]?.avg_price) || 0,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching stats:", err);
+    res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: "Failed to fetch stats" } });
+  }
+});
+
+export default router;

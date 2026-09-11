@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
-import { rs, formatDate } from "../../lib/utils";
+import { rs } from "../../lib/utils";
 
 export default function PricesPage() {
   const [prices, setPrices] = useState<any[]>([]);
@@ -8,9 +8,8 @@ export default function PricesPage() {
   const [newPrice, setNewPrice] = useState(0);
   const [reason, setReason] = useState("");
   const [toast, setToast] = useState("");
-  const [loading, setLoading] = useState(true);
 
-  const load = () => { setLoading(true); api.getAdminPrices().then(setPrices).finally(() => setLoading(false)); };
+  const load = () => { api.getAdminPrices().then(setPrices); };
   useEffect(() => { load(); }, []);
 
   const selected = prices.find((p) => p.teaGradeId === teaId);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
-import { rs, availabilityLabel, availabilityClass } from "../../lib/utils";
+import { rs } from "../../lib/utils";
 
 export default function TeaCataloguePage() {
   const [tea, setTea] = useState<any[]>([]);

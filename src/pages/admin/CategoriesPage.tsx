@@ -31,7 +31,7 @@ export default function CategoriesPage() {
   };
 
   const activeCat = cats.find((x) => x.id === selected);
-  const gradeCount = (catId: string) => "—";
+  const gradeCount = (_catId: string) => "—";
 
   if (loading) return <div className="spinner" style={{ margin: "40px auto" }} />;
 

@@ -10,11 +10,7 @@ export default function BulkPricePage() {
   const [reason, setReason] = useState("");
   const [preview, setPreview] = useState<any[]>([]);
   const [toast, setToast] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => { api.getAdminPrices().then(setPrices).finally(() => setLoading(false)); }, []);
-
-  const toggle = (id: string) => setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  useEffect(() => { api.getAdminPrices().then(setPrices); }, []);
   const selectAll = () => setSelected(new Set(prices.map((p) => p.teaGradeId)));
 
   useEffect(() => {

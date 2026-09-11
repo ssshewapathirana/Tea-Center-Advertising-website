@@ -6,18 +6,25 @@ dotenv.config({ path: resolve(dirname(fileURLToPath(import.meta.url)), "../.env.
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import authRoutes from "./routes/auth";
-import publicRoutes from "./routes/public";
-import adminRoutes from "./routes/admin";
+import authRoutes from "./routes/auth.js";
+import publicRoutes from "./routes/public.js";
+import adminRoutes from "./routes/admin.js";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { asc } from "drizzle-orm";
-import { images } from "../db/schema/images";
+import { images } from "../db/schema/images.js";
 
 const app = express();
 
-const allowedOrigin = process.env.VITE_DEV_SERVER_URL || process.env.FRONTEND_URL;
-app.use(cors({ origin: allowedOrigin || true, credentials: true }));
+// The production frontend and API are same-origin on Vercel, so CORS is only
+// needed for the local Vite + Express development setup.
+if (!process.env.VERCEL) {
+  app.use(cors({
+    origin: process.env.VITE_DEV_SERVER_URL || "http://localhost:5173",
+    credentials: true,
+  }));
+}
+
 app.use(express.json());
 app.use(cookieParser());
 

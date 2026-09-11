@@ -8,7 +8,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import publicRoutes from "./routes/public.js";
-import adminRoutes from "./routes/admin.js";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { asc } from "drizzle-orm";
@@ -16,8 +15,6 @@ import { images } from "../db/schema/images.js";
 
 const app = express();
 
-// The production frontend and API are same-origin on Vercel, so CORS is only
-// needed for the local Vite + Express development setup.
 if (!process.env.VERCEL) {
   app.use(cors({
     origin: process.env.VITE_DEV_SERVER_URL || "http://localhost:5173",
@@ -30,7 +27,19 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/public", publicRoutes);
-app.use("/api/admin", adminRoutes);
+
+// Load the larger admin router only when an admin endpoint is actually used.
+// This keeps public endpoints and health checks from failing during module load
+// because of unrelated admin-only code.
+app.use("/api/admin", async (req, res, next) => {
+  try {
+    const { default: adminRoutes } = await import("./routes/admin.js");
+    adminRoutes(req, res, next);
+  } catch (err) {
+    console.error("Admin router load error:", err);
+    res.status(500).json({ success: false, error: { code: "SERVER_ERROR", message: "Admin API failed to initialize" } });
+  }
+});
 
 app.get("/api/images", async (_req, res) => {
   try {

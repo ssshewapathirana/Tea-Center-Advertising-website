@@ -1,5 +1,5 @@
 import { pgTable, uuid, varchar, numeric, boolean, timestamp } from "drizzle-orm/pg-core";
-import { teaGrades } from "./tea-grades";
+import { teaGrades } from "./tea-grades.js";
 
 export const prices = pgTable("prices", {
   id: uuid("id").defaultRandom().primaryKey(),

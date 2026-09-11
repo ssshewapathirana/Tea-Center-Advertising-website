@@ -3,8 +3,8 @@ import bcrypt from "bcryptjs";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq } from "drizzle-orm";
-import { users } from "../../db/schema/users";
-import { generateToken, authMiddleware } from "../middleware/auth";
+import { users } from "../../db/schema/users.js";
+import { generateToken, authMiddleware } from "../middleware/auth.js";
 import { z } from "zod";
 
 const router = Router();
@@ -14,6 +14,12 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+function getDb() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) throw new Error("DATABASE_URL is not configured");
+  return drizzle(neon(databaseUrl));
+}
+
 router.post("/login", async (req: Request, res: Response) => {
   try {
     const parsed = loginSchema.safeParse(req.body);
@@ -22,7 +28,7 @@ router.post("/login", async (req: Request, res: Response) => {
       return;
     }
 
-    const db = drizzle(neon(process.env.DATABASE_URL!));
+    const db = getDb();
     const result = await db.select().from(users).where(eq(users.email, parsed.data.email));
 
     if (!result.length) {
@@ -47,7 +53,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL),
       sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000,
     });

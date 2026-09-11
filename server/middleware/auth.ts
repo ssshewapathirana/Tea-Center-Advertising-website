@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const AUTH_SECRET = process.env.AUTH_SECRET || "newberg-tea-centre-secret";
+function getAuthSecret(): string {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) throw new Error("AUTH_SECRET is not configured");
+  return secret;
+}
 
 export interface AuthUser {
   userId: string;
@@ -10,16 +14,14 @@ export interface AuthUser {
   name: string;
 }
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: AuthUser;
-    }
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: AuthUser;
   }
 }
 
 export function generateToken(user: AuthUser): string {
-  return jwt.sign(user, AUTH_SECRET, { expiresIn: "24h" });
+  return jwt.sign(user, getAuthSecret(), { expiresIn: "24h" });
 }
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
@@ -33,7 +35,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   }
 
   try {
-    const decoded = jwt.verify(token, AUTH_SECRET) as AuthUser;
+    const decoded = jwt.verify(token, getAuthSecret()) as AuthUser;
     req.user = decoded;
     next();
   } catch {

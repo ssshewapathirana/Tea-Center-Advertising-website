@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 function getAuthSecret(): string {
@@ -28,12 +28,10 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
   const authHeader = req.headers.authorization;
   const cookieToken = req.cookies?.token;
   const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : cookieToken;
-
   if (!token) {
     res.status(401).json({ success: false, error: { code: "UNAUTHORIZED", message: "Authentication required" } });
     return;
   }
-
   try {
     const decoded = jwt.verify(token, getAuthSecret()) as AuthUser;
     req.user = decoded;

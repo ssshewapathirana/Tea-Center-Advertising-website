@@ -36,10 +36,7 @@ export default function AdminLoginPage() {
           <div className="visual-content">
             <div className="brand">
               <span className="mark" />
-              <div>
-                <strong>Newberg</strong>
-                <span>TEA CENTRE</span>
-              </div>
+              <div><strong>Newberg</strong><span>TEA CENTRE</span></div>
             </div>
             <div className="visual-copy">
               <div className="eyebrow">Admin workspace</div>
@@ -56,16 +53,14 @@ export default function AdminLoginPage() {
             <p className="lead">Use your administrator account to access the tea catalogue control centre.</p>
             <form onSubmit={handleSubmit}>
               <div className="field-group">
-                <label htmlFor="email">Email or username</label>
-                <input className="field" id="email" type="text" autoComplete="username" placeholder="admin@newbergtea.lk" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <label htmlFor="email">Email</label>
+                <input className="field" id="email" type="email" autoComplete="username" placeholder="admin@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
               <div className="field-group">
                 <label htmlFor="password">Password</label>
                 <div className="password-wrap">
                   <input className="field" id="password" type={showPw ? "text" : "password"} autoComplete="current-password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                  <button className="show-pass" type="button" onClick={() => setShowPw(!showPw)} aria-label={showPw ? "Hide password" : "Show password"}>
-                    {showPw ? "◌" : "◉"}
-                  </button>
+                  <button className="show-pass" type="button" onClick={() => setShowPw(!showPw)} aria-label={showPw ? "Hide password" : "Show password"}>{showPw ? "◌" : "◉"}</button>
                 </div>
               </div>
               <div className="row">
@@ -74,7 +69,6 @@ export default function AdminLoginPage() {
               </div>
               <button className="submit" type="submit" disabled={loading}>{loading ? "Signing in..." : "Sign in to dashboard →"}</button>
               {error && <div className="error show">{error}</div>}
-              <div className="demo-note"><strong>Access:</strong> username <strong>admin</strong> · password <strong>newberg2026</strong></div>
             </form>
             <div className="footer-note">Newberg Tea Centre · Administration interface</div>
           </div>
